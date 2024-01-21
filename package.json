@@ -1,0 +1,23 @@
+{
+  "name": "gcal-calculate-hours",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gerry004/gcal-calculate-hours.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gerry004/gcal-calculate-hours/issues"
+  },
+  "homepage": "https://github.com/gerry004/gcal-calculate-hours#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
