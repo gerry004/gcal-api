@@ -21,12 +21,18 @@ const DEFAULT_COLOR_IDS = {
 }
 
 const COLOR_ID_LEGEND = {
-  1: "Lavendar",
+  1: "Lavender",
   2: "Sage",
   3: "Grape",
+  4: "Flamingo",
   5: "Banana",
+  6: "Tangerine",
+  7: "Peacock",
+  8: "Graphite",
   9: "Blueberry",
-  11: "Tomato"
+  10: "Basil",
+  11: "Tomato",
+  12: "Mandarin",
 }
 
 app.get('/', async (req, res) => {

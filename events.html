@@ -22,6 +22,7 @@
       Calculate
     </button>
   </div>
+  <div id="resultContainer" class="container m-auto p-4"></div>
 
   <script>
     const getEvents = () => {
@@ -39,7 +40,23 @@
         body: JSON.stringify(data),
       })
         .then(response => response.json())
-        .then(data => console.log('Response from server:', data))
+        .then(data => {
+          const resultContainer = document.getElementById('resultContainer');
+          resultContainer.innerHTML = '';
+
+          const headingElement = document.createElement('h1');
+          headingElement.className = 'text-2xl font-bold mb-4';
+          headingElement.textContent = 'Total Hours By Color';
+          resultContainer.appendChild(headingElement);
+
+          Object.keys(data).forEach((key) => {
+            const element = document.createElement('p');
+            element.textContent = `${key}: ${data[key].hours} hours ${data[key].minutes} minutes`;
+            element.className = "p-4 border rounded-md mt-4";
+            resultContainer.appendChild(element);
+          });
+
+        })
         .catch(error => console.error('Error:', error));
     };
   </script>
