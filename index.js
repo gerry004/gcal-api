@@ -1,17 +1,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const app = express();
-app.use(bodyParser.json());
-const port = 3000;
-
 const { google } = require('googleapis');
 const fs = require('fs').promises;
 const path = require('path');
+const { oauth2Client, refreshToken, isAuthenticated } = require('./authentication.js');
+const { getCalendars, getEvents, sortEventsByColor, calculateTimeSpentByColor, concatenateArrayOfObjects, serialiseObject } = require('./helpers.js');
+
+const app = express();
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname)));
 
-const { oauth2Client, refreshToken, isAuthenticated } = require('./authentication.js');
-const { getCalendars, getEvents, sortEventsByColor, calculateTimeSpentByColor, concatenateArrayOfObjects } = require('./helpers.js');
-
+const port = 3000;
 const TOKEN_PATH = path.join(__dirname, 'token.json');
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
@@ -76,11 +75,12 @@ app.post('/events', async (req, res) => {
       const events = await getEvents(calendar, cal.id, startDate, endDate);
       const eventsByColor = sortEventsByColor(events, DEFAULT_COLOR_IDS[cal.summary]);
       const timeSpentByColor = calculateTimeSpentByColor(eventsByColor);
-      console.log(timeSpentByColor);
       return timeSpentByColor;
     }));
+
     const timeSpentByColor = concatenateArrayOfObjects(timeSpentByColors);
-    res.json(timeSpentByColor);
+    const timeSpentByColorWithColorNames = serialiseObject(timeSpentByColor, COLOR_ID_LEGEND);
+    res.json(timeSpentByColorWithColorNames);
   }
   catch (error) {
     console.error('Error fetching events:', error.message);

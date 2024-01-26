@@ -49,18 +49,28 @@ const calculateTimeSpentByColor = (eventsByColor) => {
       const timeDifference = calculateTimeDifferenceInMilliseconds(startDateTime, endDateTime);
       timeSpentInMilliseconds += timeDifference;
     });
-    const { hours, minutes } = convertMillisecondsToHoursAndMinutes(timeSpentInMilliseconds);
-    timeSpentByColor[color] = { hours, minutes };
+    const minutes = millisecondsToMinutes(timeSpentInMilliseconds);
+    timeSpentByColor[color] = minutes;
   });
   return timeSpentByColor;
 }
 
-const convertMillisecondsToHoursAndMinutes = (milliseconds) => {
-  const totalMinutes = Math.floor(milliseconds / (1000 * 60));
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  return { hours, minutes };
-};
+const millisecondsToMinutes = (milliseconds) => {
+  if (typeof milliseconds !== 'number' || milliseconds < 0) {
+    throw new Error('Input must be a positive number representing milliseconds.');
+  }
+  const minutes = milliseconds / (1000 * 60);
+  return minutes;
+}
+
+const minutesToHoursAndMinutes = (minutes) => {
+  if (typeof minutes !== 'number' || minutes < 0) {
+    throw new Error('Input must be a positive number representing minutes.');
+  }
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return { hours, minutes: remainingMinutes };
+}
 
 const calculateTimeDifferenceInMilliseconds = (startDateTime, endDateTime) => {
   const startDate = new Date(startDateTime);
@@ -73,14 +83,26 @@ const calculateTimeDifferenceInMilliseconds = (startDateTime, endDateTime) => {
 }
 
 const concatenateArrayOfObjects = (arrayOfObjects) => {
-  const concatendatedObject = {};
+  const concatenatedObject = {};
   arrayOfObjects.forEach(obj => {
     Object.keys(obj).forEach(key => {
-      concatendatedObject[key] = concatendatedObject[key] || {};
-      concatendatedObject[key] = { ...concatendatedObject[key], ...obj[key] };
+      if (!concatenatedObject[key]) {
+        concatenatedObject[key] = 0;
+      }
+      if (typeof obj[key] === 'number') {
+        concatenatedObject[key] += obj[key];
+      }
     });
   });
-  return concatendatedObject;
+  return concatenatedObject;
+}
+
+const serialiseObject = (obj, legend) => {
+  const serialisedObject = {};
+  Object.keys(obj).forEach(key => {
+    serialisedObject[legend[key]] = minutesToHoursAndMinutes(obj[key]);
+  });
+  return serialisedObject;
 }
 
 module.exports = {
@@ -89,4 +111,5 @@ module.exports = {
   sortEventsByColor,
   calculateTimeSpentByColor,
   concatenateArrayOfObjects,
+  serialiseObject,
 };
