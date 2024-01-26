@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gCal - Calculate Hours</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container m-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Google Calendar - Calculate Hours</h1>
+
+    <label for="startDate" class="block text-sm font-medium text-gray-600">Start Date:</label>
+    <input type="date" id="startDate" class="mt-1 p-2 border rounded-md w-full">
+
+    <label for="endDate" class="block text-sm font-medium text-gray-600 mt-4">End Date:</label>
+    <input type="date" id="endDate" class="mt-1 p-2 border rounded-md w-full">
+
+    <button id="clickButton" onclick="getEvents()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+      Calculate
+    </button>
+  </div>
+
+  <script>
+    const getEvents = () => {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+
+      if (!startDate || !endDate) { return alert('Please select both start and end dates'); }
+      const data = { startDate: startDate + "T00:00:00Z", endDate: endDate + "T23:59:59Z" };
+
+      fetch('/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+        .then(response => response.json())
+        .then(data => console.log('Response from server:', data))
+        .catch(error => console.error('Error:', error));
+    };
+  </script>
+</body>
+
+</html>

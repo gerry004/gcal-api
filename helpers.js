@@ -72,9 +72,21 @@ const calculateTimeDifferenceInMilliseconds = (startDateTime, endDateTime) => {
   return timeDifference;
 }
 
+const concatenateArrayOfObjects = (arrayOfObjects) => {
+  const concatendatedObject = {};
+  arrayOfObjects.forEach(obj => {
+    Object.keys(obj).forEach(key => {
+      concatendatedObject[key] = concatendatedObject[key] || {};
+      concatendatedObject[key] = { ...concatendatedObject[key], ...obj[key] };
+    });
+  });
+  return concatendatedObject;
+}
+
 module.exports = {
   getCalendars,
   getEvents,
   sortEventsByColor,
-  calculateTimeSpentByColor
+  calculateTimeSpentByColor,
+  concatenateArrayOfObjects,
 };
