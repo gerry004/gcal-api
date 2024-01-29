@@ -112,4 +112,5 @@ module.exports = {
   calculateTimeSpentByColor,
   concatenateArrayOfObjects,
   serialiseObject,
+  minutesToHoursAndMinutes,
 };
