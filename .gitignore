@@ -28,7 +28,7 @@ vendor/
 
 # dotenv environment variable files
 .env
-
+.env.production
 # macOS
 .DS_Store
 
