@@ -1,11 +1,14 @@
-const { oauth2Client, refreshToken, isAuthenticated } = require('./authentication.js');
-const { getCalendars, getEvents, sortEventsByColor, calculateTimeSpentByColor, concatenateArrayOfObjects, serialiseObject } = require('./helpers.js');
+const express = require('express');
+const router = express.Router();
+const {google} = require('googleapis');
+const authClient = require('../constants/authClient');
 
-const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+// const { oauth2Client, refreshToken, isAuthenticated } = require('./authentication.js');
+// const { getCalendars, getEvents, sortEventsByColor, calculateTimeSpentByColor, concatenateArrayOfObjects, serialiseObject } = require('./helpers.js');
 
-const TOKEN_PATH = path.join(__dirname, 'token.json');
-const SCOPES = ['https://www.googleapis.com/auth/calendar'];
+const calendar = google.calendar({ version: 'v3', auth: authClient });
 
+// const TOKEN_PATH = path.join(__dirname, 'token.json');
 
 const DEFAULT_COLOR_IDS = {
   "gerry04y@gmail.com": 1,
@@ -26,6 +29,15 @@ const COLOR_ID_LEGEND = {
   11: "Tomato",
   12: "Mandarin",
 }
+
+router.post('/events', async (req, res) => {
+  // console.log({req, calendar })
+  const response = await calendar.colors.get();
+  const colors = response.data.calendar;
+  res.json({colors});
+});
+
+module.exports = router;
 
 // app.get('/events', async (req, res) => {
 //   if (await isAuthenticated()) {

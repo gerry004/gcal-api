@@ -11,7 +11,9 @@ app.use(cors({ origin: 'http://localhost:8080', credentials: true}));
 
 // Routing
 const authRouter = require('./routes/auth');
+const calendarRouter = require('./routes/calendar');
 app.use('/', authRouter);
+app.use('/calendar', calendarRouter);
 
 const port = process.env.PORT;
 
