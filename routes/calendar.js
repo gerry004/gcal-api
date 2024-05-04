@@ -34,16 +34,29 @@ router.get('/colors', jwtAuthMiddleware, async (req, res) => {
 
 router.get("/events", jwtAuthMiddleware, async (req, res) => {
   try {
-    const response = await calendar.events.list({
-      calendarId: "primary",
-      timeMin: new Date().toISOString(),
-      maxResults: 2,
-      singleEvents: true,
-      orderBy: "startTime",
-    });
-    const events = response.data.items || [];
-    console.log(events);
-    res.json({ events })
+    const startDate = req.query.startDate + 'T00:00:00Z';
+    const endDate = req.query.endDate + 'T00:00:00Z';
+    const calendars = req.query.calendars;
+    const colors = req.query.colors;
+
+    const eventsPromises = calendars.map((cal) =>
+      calendar.events.list({
+        calendarId: cal.id,
+        timeMin: startDate,
+        timeMax: endDate,
+        singleEvents: true,
+        orderBy: 'startTime',
+      })
+    );
+
+    const results = await Promise.all(eventsPromises);
+    const events = results.flatMap((result) => result.data.items);
+
+    const filteredEvents = events.filter(
+      (event) => Object.keys(colors).includes(event.colorId)
+    );
+
+    res.json({ events: filteredEvents });
   
   } catch (error) {
     console.log('Error fetching events:', error.message)
