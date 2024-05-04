@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {google} = require('googleapis');
+const { google } = require('googleapis');
 const authClient = require('../constants/authClient');
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.SECRET_KEY;
@@ -22,22 +22,45 @@ function jwtAuthMiddleware(req, res, next) {
   });
 }
 
-router.post('/events', jwtAuthMiddleware, async (req, res) => {
-  const response = await calendar.colors.get();
-  const colors = response.data.calendar;
-  res.json({colors});
+router.get('/colors', jwtAuthMiddleware, async (req, res) => {
+  try {
+    const response = await calendar.colors.get();
+    const eventColors = response.data.event;
+    res.json({ colors: eventColors });
+  } catch (error) {
+    res.status(500).send('Error fetching calendar list');
+  }
+});
+
+router.get("/events", jwtAuthMiddleware, async (req, res) => {
+  try {
+    const response = await calendar.events.list({
+      calendarId: "primary",
+      timeMin: new Date().toISOString(),
+      maxResults: 2,
+      singleEvents: true,
+      orderBy: "startTime",
+    });
+    const events = response.data.items || [];
+    console.log(events);
+    res.json({ events })
+  
+  } catch (error) {
+    console.log('Error fetching events:', error.message)
+    res.status(500).send('Error fetching events');
+  }
+});
+
+router.get('/calendars', jwtAuthMiddleware, async (req, res) => {
+  try {
+    const response = await calendar.calendarList.list();
+    res.json({ calendars: response.data.items });
+  } catch (error) {
+    res.status(500).send('Error fetching calendar list');
+  }
 });
 
 module.exports = router;
-
-// app.get('/events', async (req, res) => {
-//   if (await isAuthenticated()) {
-//     await refreshToken(TOKEN_PATH);
-//     res.sendFile(path.join(__dirname, 'events.html'));
-//   } else {
-//     res.redirect('/');
-//   }
-// });
 
 // app.post('/events', async (req, res) => {
 //   try {
