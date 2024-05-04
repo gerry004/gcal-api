@@ -2,36 +2,27 @@ const express = require('express');
 const router = express.Router();
 const {google} = require('googleapis');
 const authClient = require('../constants/authClient');
-
-// const { oauth2Client, refreshToken, isAuthenticated } = require('./authentication.js');
-// const { getCalendars, getEvents, sortEventsByColor, calculateTimeSpentByColor, concatenateArrayOfObjects, serialiseObject } = require('./helpers.js');
+const jwt = require('jsonwebtoken');
+const secretKey = process.env.SECRET_KEY;
 
 const calendar = google.calendar({ version: 'v3', auth: authClient });
 
-// const TOKEN_PATH = path.join(__dirname, 'token.json');
+function jwtAuthMiddleware(req, res, next) {
+  const jwtToken = req.cookies.jwtToken;
+  if (!jwtToken) {
+    return res.status(401).send('Unauthorized');
+  }
 
-const DEFAULT_COLOR_IDS = {
-  "gerry04y@gmail.com": 1,
-  "Gerry Piano": 2
+  jwt.verify(jwtToken, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).send('Unauthorized');
+    }
+    authClient.setCredentials(decoded);
+    next();
+  });
 }
 
-const COLOR_ID_LEGEND = {
-  1: "Lavender",
-  2: "Sage",
-  3: "Grape",
-  4: "Flamingo",
-  5: "Banana",
-  6: "Tangerine",
-  7: "Peacock",
-  8: "Graphite",
-  9: "Blueberry",
-  10: "Basil",
-  11: "Tomato",
-  12: "Mandarin",
-}
-
-router.post('/events', async (req, res) => {
-  // console.log({req, calendar })
+router.post('/events', jwtAuthMiddleware, async (req, res) => {
   const response = await calendar.colors.get();
   const colors = response.data.calendar;
   res.json({colors});
