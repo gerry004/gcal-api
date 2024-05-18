@@ -34,35 +34,41 @@ router.get('/colors', isAuthenticated, async (req, res) => {
 
 router.get("/events", isAuthenticated, async (req, res) => {
   try {
-    const startDate = req.query.startDate + 'T00:00:00Z';
-    const endDate = req.query.endDate + 'T00:00:00Z';
-    const calendars = req.query.calendars;
-    const colors = req.query.colors;
+    const { startDate, endDate, calendars } = req.query;
 
-    const eventsPromises = calendars.map((cal) =>
-      calendar.events.list({
-        calendarId: cal.id,
-        timeMin: startDate,
-        timeMax: endDate,
-        singleEvents: true,
-        orderBy: 'startTime',
-      })
-    );
+    const startDateTime = startDate + 'T00:00:00Z';
+    const endDateTime = endDate + 'T23:59:59Z';
+
+    const eventsPromises = calendars.map(async (cal) => {
+      try {
+        const response = await calendar.events.list({
+          calendarId: cal.id,
+          timeMin: startDateTime,
+          timeMax: endDateTime,
+          singleEvents: true,
+          orderBy: 'startTime',
+        });
+        
+        return response.data.items.map((event) => ({
+          ...event,
+          colorId: event.colorId || cal.defaultEventColor,
+        }));
+      } catch (error) {
+        console.error('Error fetching events for calendar', cal.id, ':', error.message);
+        return [];
+      }
+    });
 
     const results = await Promise.all(eventsPromises);
-    const events = results.flatMap((result) => result.data.items);
-
-    const filteredEvents = events.filter(
-      (event) => Object.keys(colors).includes(event.colorId)
-    );
-
-    res.json({ events: filteredEvents });
-  
+    const events = results.flat();
+    
+    res.json({ events });
   } catch (error) {
-    console.log('Error fetching events:', error.message)
+    console.error('Error processing events:', error.message);
     res.status(500).send('Error fetching events');
   }
 });
+
 
 router.get('/calendars', isAuthenticated, async (req, res) => {
   try {
