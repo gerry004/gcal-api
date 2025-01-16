@@ -25,12 +25,34 @@ router.get('/google/redirect', async function (req, res, next) {
     res.cookie('jwtToken', jwtToken, { httpOnly: true, secure: false });
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false });
 
-    res.redirect('http://localhost:8080/dashboard');
-
+    res.redirect('http://localhost:8080/');
   } catch (err) {
     console.error('Error logging in with OAuth2 user', err);
     res.status(500).send('Authentication failed');
   }
+});
+
+router.get('/isAuthenticated', function (req, res, next) {
+  const jwtToken = req.cookies.jwtToken;
+
+  if (!jwtToken) {
+    return res.json({ isAuthenticated: false, message: 'Unauthorized: No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(jwtToken, process.env.SECRET_KEY);
+    res.json({ isAuthenticated: true, message: 'Authenticated', user: decoded });
+  } catch (err) {
+    console.error('Invalid token', err);
+    res.json({ isAuthenticated: false, message: 'Unauthorized: Invalid token' });
+  }
+});
+
+router.get('/logout', function (req, res, next) {
+  res.clearCookie('jwtToken');
+  res.clearCookie('refreshToken');
+
+  res.json({ message: 'Successfully logged out' });
 });
 
 module.exports = router;

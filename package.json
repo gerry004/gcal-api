@@ -27,6 +27,7 @@
     "express-session": "^1.18.0",
     "google-auth-library": "^9.9.0",
     "googleapis": "^131.0.0",
+    "ical.js": "^2.1.0",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
