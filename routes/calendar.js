@@ -112,9 +112,10 @@ router.get("/summary", isAuthenticated, async (req, res) => {
   try {
     const { calendars, startDate, endDate } = req.query;
     const events = await getEventsNow(startDate, endDate, calendars);
-    // const summary = await getSummary(events);
+    const parsedEvents = events.map((event) => { return { summary: event.summary, id: event.id } });
+    // const summary = await getSummary(parsedEvents);
 
-    res.json({ summary: "summary" });
+    res.json({ summary: summary });
   } catch (error) {
     res.status(500).send("Error fetching summary");
   }
