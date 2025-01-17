@@ -28,7 +28,8 @@
     "google-auth-library": "^9.9.0",
     "googleapis": "^131.0.0",
     "ical.js": "^2.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "openai": "^4.78.1"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.1"
